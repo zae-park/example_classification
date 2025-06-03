@@ -1,3 +1,4 @@
+import timm
 import torch
 import torch.nn as nn
 from torchvision.models import *
@@ -15,6 +16,8 @@ def get_model(model_name: str, num_classes: int) -> nn.Module:
         return get_gray_efficientnet(version, num_classes)
     elif model_name.startswith("swin_"):
         return get_gray_swin(model_name, num_classes)
+    elif model_name.startswith("coatnet_"):
+        return get_gray_coatnet(model_name, num_classes)
     else:
         raise ValueError(f"Unsupported model name: {model_name}")
 
@@ -107,4 +110,30 @@ def get_gray_swin(model_name: str, num_classes: int) -> nn.Module:
     model.features[0][0] = new_conv
     model.head = nn.Linear(model.head.in_features, num_classes)
 
+    return model
+
+
+def get_gray_coatnet(version: str, num_classes: int) -> nn.Module:
+    if version not in timm.list_models("*coatnet*"):
+        raise ValueError(f"Unsupported CoAtNet version: {version}")
+
+    # Load pretrained model
+    model = timm.create_model(version, pretrained=True)
+
+    # 입력 채널 수정 (1채널 grayscale → 3채널 mean 복사)
+    conv_stem = model.conv_stem
+    new_conv = nn.Conv2d(
+        in_channels=1,
+        out_channels=conv_stem.out_channels,
+        kernel_size=conv_stem.kernel_size,
+        stride=conv_stem.stride,
+        padding=conv_stem.padding,
+        bias=False
+    )
+    with torch.no_grad():
+        new_conv.weight = nn.Parameter(conv_stem.weight.mean(dim=1, keepdim=True))
+    model.conv_stem = new_conv
+
+    # 출력 클래스 수 수정
+    model.head.fc = nn.Linear(model.head.fc.in_features, num_classes)
     return model

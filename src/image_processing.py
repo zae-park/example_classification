@@ -2,7 +2,10 @@ from torchvision import transforms
 
 # 각 모델별 expected input size 정의
 MODEL_INPUT_SIZE_MAP = {
+    # ResNet
     "resnet": (224, 224),
+
+    # EfficientNet
     "efficientnet_b0": (224, 224),
     "efficientnet_b1": (240, 240),
     "efficientnet_b2": (260, 260),
@@ -11,6 +14,18 @@ MODEL_INPUT_SIZE_MAP = {
     "efficientnet_b5": (456, 456),
     "efficientnet_b6": (528, 528),
     "efficientnet_b7": (600, 600),
+
+    # Swin Transformer
+    "swin_t": (224, 224),
+    "swin_s": (224, 224),
+    "swin_b": (224, 224),
+
+    # CoAtNet
+    "coatnet_0": (224, 224),
+    "coatnet_1": (224, 224),
+    "coatnet_2": (224, 224),
+    "coatnet_3": (224, 224),
+    "coatnet_4": (224, 224),
 }
 
 
