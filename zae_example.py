@@ -156,9 +156,7 @@ def main():
     # 2. Summary 출력
     print("Summary")
     summary = summarizer.Summary(y_true=y_true, y_pred=y_pred, label_map=train_dataset.idx_to_label)
-    summary.summary()
-
-    print("Summary")
+    summary.summary(log_to_wandb=WEB_LOGGING)
 
     if WEB_LOGGING:
         wandb.finish()

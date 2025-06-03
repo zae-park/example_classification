@@ -23,7 +23,7 @@ class Summary:
         print(f"  Recall   : {recall:.4f}")
         print(f"  F1 Score : {f1:.4f}")
 
-    def show_confusion_matrix(self):
+    def show_confusion_matrix(self, log_to_wandb: bool = False):
         cm = confusion_matrix(self.y_true, self.y_pred, labels=self.labels)
         plt.figure(figsize=(8, 6))
         sns.heatmap(cm, annot=True, fmt='d', cmap="Blues",
@@ -32,8 +32,13 @@ class Summary:
         plt.ylabel("True")
         plt.title("Confusion Matrix")
         plt.tight_layout()
+
+        if log_to_wandb:
+            import wandb
+            wandb.log({"confusion_matrix": wandb.Image(plt.gcf())})
+
         plt.show()
 
-    def summary(self):
+    def summary(self, log_to_wandb: bool = False):
         self.print_metrics()
-        self.show_confusion_matrix()
+        self.show_confusion_matrix(log_to_wandb=log_to_wandb)
