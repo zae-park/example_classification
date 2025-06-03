@@ -122,18 +122,18 @@ def get_gray_coatnet(version: str, num_classes: int) -> nn.Module:
     model = timm.create_model(model_name, pretrained=True)
 
     # 입력 채널 수정 (1채널 grayscale → 3채널 mean 복사)
-    conv_stem = model.conv_stem
-    new_conv = nn.Conv2d(
+    conv1 = model.stem.conv1
+    new_conv1 = nn.Conv2d(
         in_channels=1,
-        out_channels=conv_stem.out_channels,
-        kernel_size=conv_stem.kernel_size,
-        stride=conv_stem.stride,
-        padding=conv_stem.padding,
-        bias=False
+        out_channels=conv1.out_channels,
+        kernel_size=conv1.kernel_size,
+        stride=conv1.stride,
+        padding=conv1.padding,
+        bias=conv1.bias is not None
     )
     with torch.no_grad():
-        new_conv.weight = nn.Parameter(conv_stem.weight.mean(dim=1, keepdim=True))
-    model.conv_stem = new_conv
+        new_conv1.weight.copy_(conv1.weight.mean(dim=1, keepdim=True))  # RGB → gray로 평균화
+    model.stem.conv1 = new_conv1
 
     # 출력 클래스 수 수정
     model.head.fc = nn.Linear(model.head.fc.in_features, num_classes)
