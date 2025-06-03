@@ -28,7 +28,7 @@ DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
 WEB_LOGGING = True
 PROJECT_NAME = "EX-classification"
-MODEL_NAME = "resnet_50"
+MODEL_NAME = "efficientnet_b0"
 RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
 LOG_CONFIG = {"LR": LR, "BATCH_SIZE": BATCH_SIZE, "EPOCHS": EPOCHS, "BACKBONE": MODEL_NAME.split("_")[0]}
 
@@ -126,13 +126,6 @@ def main():
     valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    # Initial WebLogger
-    if WEB_LOGGING:
-        wandb.init(project=PROJECT_NAME, name=RUN_NAME, config=LOG_CONFIG)
-    else:
-        import matplotlib
-        matplotlib.use('TkAgg')
-
     # Define model & trainer
     model = models.get_model(model_name=MODEL_NAME, num_classes=max(label_indices) + 1)
     ex_optimizer = torch.optim.Adam(params=model.parameters(), lr=LR)
@@ -143,6 +136,11 @@ def main():
     ex_trainer = ExTrainer(model, device=DEVICE, optimizer=ex_optimizer, scheduler=ex_scheduler)
 
     # Training & Validation
+    if WEB_LOGGING:
+        wandb.init(project=PROJECT_NAME, name=RUN_NAME, config=LOG_CONFIG)
+    else:
+        import matplotlib
+        matplotlib.use('TkAgg')
     ex_trainer.run(n_epoch=EPOCHS, loader=train_loader, valid_loader=valid_loader)
 
     # Inference
