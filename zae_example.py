@@ -83,7 +83,7 @@ class ExTrainer(trainer.Trainer):
 
         log_dict = {"loss": loss, "output": p, "acc": acc, "precision": precision, "recall": recall, "f1": f1}
         if WEB_LOGGING:
-            wandb.log(**log_dict)
+            wandb.log(log_dict)
         return log_dict
 
     def test_step(self, batch):
