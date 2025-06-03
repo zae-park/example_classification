@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "classification"
+version = "0.1.0"
+description = ""
+authors = ["zae-park <tom941105@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = [
+    { version = "^2.0.0", source = "PyPI", markers = "sys_platform == 'darwin'"},
+    { platform = "!= darwin", source = "pytorch", version = "^2.0.0"},
+]
+torchvision = [
+    { version = "^0.15.1", source = "PyPI", markers = "sys_platform == 'darwin'"},
+    { platform = "!= darwin", source = "pytorch", version = "^0.15.1"},
+]
+#zae-engine = "^0.7.6"
+scikit-learn = "^1.6.1"
+#fastparquet = "^2024.11.0"
+#pytest = "^8.4.0"
+tqdm = "^4.67.1"
+numpy = "1.24.4"
+wandb = "^0.19.11"
+matplotlib = "^3.10.3"
+seaborn = "^0.13.2"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu117"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "pytorch-vision"
+url = "https://download.pytorch.org/whl/cu117"
+priority = "explicit"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
