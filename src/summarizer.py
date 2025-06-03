@@ -14,7 +14,7 @@ class Summary:
         self.labels = list(label_map.keys())
         self.label_names = [label_map[i] for i in self.labels]
 
-    def print_metrics(self):
+    def print_metrics(self, log_to_wandb=False):
         acc = accuracy_score(self.y_true, self.y_pred)
         precision = precision_score(self.y_true, self.y_pred, average="macro", zero_division=0)
         recall = recall_score(self.y_true, self.y_pred, average="macro", zero_division=0)
@@ -25,6 +25,10 @@ class Summary:
         print(f"  Precision: {precision:.4f}")
         print(f"  Recall   : {recall:.4f}")
         print(f"  F1 Score : {f1:.4f}")
+
+        if log_to_wandb:
+            import wandb
+            wandb.log({"test_accuracy": acc, "test_precision": precision, "test_recall": recall, "test_f1": f1})
 
     def show_confusion_matrix(self, log_to_wandb: bool = False):
         cm = confusion_matrix(self.y_true, self.y_pred, labels=self.labels)
@@ -43,5 +47,5 @@ class Summary:
             plt.show()
 
     def summary(self, log_to_wandb: bool = False):
-        self.print_metrics()
+        self.print_metrics(log_to_wandb=log_to_wandb)
         self.show_confusion_matrix(log_to_wandb=log_to_wandb)
