@@ -143,6 +143,7 @@ def main():
     ex_trainer.run(n_epoch=EPOCHS, loader=train_loader, valid_loader=valid_loader)
 
     # Inference
+    ex_trainer.apply_weights()  # select lowest val_loss version
     ex_trainer.toggle("inference")
     test_result = torch.cat(ex_trainer.inference(loader=test_loader), dim=0)
     y_true = [label for _, label in test_dataset]
