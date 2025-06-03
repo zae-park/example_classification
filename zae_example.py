@@ -21,7 +21,7 @@ VALIDATION_RATIO = 0.2
 RANDOM_SEED = 42
 
 EPS = 1e-8
-EPOCHS = 100
+EPOCHS = 10
 BATCH_SIZE = 32
 LR = 1e-4
 DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
@@ -83,7 +83,8 @@ class ExTrainer(trainer.Trainer):
 
         log_dict = {"loss": loss, "output": p, "acc": acc, "precision": precision, "recall": recall, "f1": f1}
         if WEB_LOGGING:
-            wandb.log(log_dict)
+            prefix = "train" if self.mode == "train" else "valid" if self.mode == "test" else "inference"
+            wandb.log({f"{prefix}_k": v for k, v in log_dict.items()})
         return log_dict
 
     def test_step(self, batch):
@@ -133,6 +134,9 @@ def main():
     # Initial WebLogger
     if WEB_LOGGING:
         wandb.init(project=PROJECT_NAME, name=RUN_NAME, config=LOG_CONFIG)
+    else:
+        import matplotlib
+        matplotlib.use('TkAgg')
 
     # Define model & trainer
     model = models.get_gray_resnet(num_layer=18, num_classes=max(label_indices) + 1)
@@ -147,13 +151,11 @@ def main():
     ex_trainer.run(n_epoch=EPOCHS, loader=train_loader, valid_loader=valid_loader)
 
     # Inference
-    test_result = np.stack(ex_trainer.inference(loader=test_loader))
-
-    # 1. 예측 결과 추출
+    ex_trainer.toggle("inference")
+    test_result = torch.cat(ex_trainer.inference(loader=test_loader), dim=0)
     y_true = [label for _, label in test_dataset]
     y_pred = test_result.tolist()
 
-    # 2. Summary 출력
     print("Summary")
     summary = summarizer.Summary(y_true=y_true, y_pred=y_pred, label_map=train_dataset.idx_to_label)
     summary.summary(log_to_wandb=WEB_LOGGING)
