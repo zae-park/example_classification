@@ -26,7 +26,7 @@ BATCH_SIZE = 32
 LR = 1e-4
 DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
-WEB_LOGGING = False
+WEB_LOGGING = True
 PROJECT_NAME = "EX-classification"
 MODEL_NAME = "resnet_18"
 RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
