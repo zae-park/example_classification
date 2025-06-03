@@ -13,6 +13,7 @@ MODEL_INPUT_SIZE_MAP = {
     "efficientnet_b7": (600, 600),
 }
 
+
 def get_image_transform(model_name: str, with_augmentation: bool = False):
     model_key = model_name.lower()
 
