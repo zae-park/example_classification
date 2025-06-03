@@ -84,7 +84,7 @@ class ExTrainer(trainer.Trainer):
         log_dict = {"loss": loss, "output": p, "acc": acc, "precision": precision, "recall": recall, "f1": f1}
         if WEB_LOGGING:
             prefix = "train" if self.mode == "train" else "valid" if self.mode == "test" else "inference"
-            wandb.log({f"{prefix}_k": v for k, v in log_dict.items()})
+            wandb.log({f"{prefix}_{k}": v for k, v in log_dict.items()})
         return log_dict
 
     def test_step(self, batch):

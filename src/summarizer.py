@@ -39,8 +39,8 @@ class Summary:
         if log_to_wandb:
             import wandb
             wandb.log({"confusion_matrix": wandb.Image(plt.gcf())})
-
-        plt.show()
+        else:
+            plt.show()
 
     def summary(self, log_to_wandb: bool = False):
         self.print_metrics()
