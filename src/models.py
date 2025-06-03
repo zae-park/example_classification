@@ -114,11 +114,12 @@ def get_gray_swin(model_name: str, num_classes: int) -> nn.Module:
 
 
 def get_gray_coatnet(version: str, num_classes: int) -> nn.Module:
-    if version + "_rw_224" not in timm.list_models("*coatnet*"):
+    model_name = version + "_rw_224"
+    if model_name not in timm.list_models("*coatnet*"):
         raise ValueError(f"Unsupported CoAtNet version: {version}")
 
     # Load pretrained model
-    model = timm.create_model(version, pretrained=True)
+    model = timm.create_model(model_name, pretrained=True)
 
     # 입력 채널 수정 (1채널 grayscale → 3채널 mean 복사)
     conv_stem = model.conv_stem
