@@ -3,8 +3,21 @@ import torch.nn as nn
 from torchvision.models import *
 
 
+def get_model(model_name: str, num_classes: int) -> nn.Module:
+    """
+    Model Getter
+    """
+    if model_name.startswith("resnet_"):
+        layer_num = int(model_name.split("_")[-1])
+        return get_gray_resnet(layer_num, num_classes)
+    elif model_name.startswith("efficientnet_b"):
+        version = model_name.split("_")[-1]
+        return get_gray_efficientnet(version, num_classes)
+    else:
+        raise ValueError(f"Unsupported model name: {model_name}")
+
+
 def get_gray_resnet(num_layer: int, num_classes: int) -> nn.Module:
-    # 1. 모델 선택
     if num_layer == 18:
         model = resnet18(weights=ResNet18_Weights.DEFAULT)
     elif num_layer == 34:
@@ -18,7 +31,6 @@ def get_gray_resnet(num_layer: int, num_classes: int) -> nn.Module:
     else:
         raise ValueError(f"Unsupported ResNet layer: {num_layer}")
 
-    # 2. Conv1 수정
     pretrained_conv1 = model.conv1
     new_conv1 = nn.Conv2d(
         in_channels=1,
@@ -36,3 +48,40 @@ def get_gray_resnet(num_layer: int, num_classes: int) -> nn.Module:
     model.fc = nn.Linear(model.fc.in_features, num_classes)
 
     return model
+
+
+def get_gray_efficientnet(version: str, num_classes: int) -> nn.Module:
+    version_map = {
+        "b0": (efficientnet_b0, EfficientNet_B0_Weights),
+        "b1": (efficientnet_b1, EfficientNet_B1_Weights),
+        "b2": (efficientnet_b2, EfficientNet_B2_Weights),
+        "b3": (efficientnet_b3, EfficientNet_B3_Weights),
+        "b4": (efficientnet_b4, EfficientNet_B4_Weights),
+        "b5": (efficientnet_b5, EfficientNet_B5_Weights),
+        "b6": (efficientnet_b6, EfficientNet_B6_Weights),
+        "b7": (efficientnet_b7, EfficientNet_B7_Weights),
+    }
+
+    if version not in version_map:
+        raise ValueError(f"Unsupported EfficientNet version: {version}")
+
+    builder_fn, weight_enum = version_map[version]
+    model = builder_fn(weights=weight_enum.DEFAULT)
+
+    pretrained_conv1 = model.features[0][0]
+    new_conv1 = nn.Conv2d(
+        in_channels=1,
+        out_channels=pretrained_conv1.out_channels,
+        kernel_size=pretrained_conv1.kernel_size,
+        stride=pretrained_conv1.stride,
+        padding=pretrained_conv1.padding,
+        bias=False
+    )
+    with torch.no_grad():
+        new_conv1.weight = nn.Parameter(pretrained_conv1.weight.mean(dim=1, keepdim=True))
+
+    model.features[0][0] = new_conv1
+    model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+
+    return model
+

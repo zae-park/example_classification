@@ -131,7 +131,7 @@ def main():
         matplotlib.use('TkAgg')
 
     # Define model & trainer
-    model = models.get_gray_resnet(num_layer=int(MODEL_NAME.split("_")[-1]), num_classes=max(label_indices) + 1)
+    model = models.get_model(model_name=MODEL_NAME, num_classes=max(label_indices) + 1)
     ex_optimizer = torch.optim.Adam(params=model.parameters(), lr=LR)
     ex_scheduler = schedulers.SchedulerChain(
         schedulers.WarmUpScheduler(ex_optimizer, total_iters=(warm_epoch := EPOCHS//10)),
