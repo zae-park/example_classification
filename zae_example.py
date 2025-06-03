@@ -112,12 +112,15 @@ def main():
     test_data = [(dp, label_map[label]) for dp, label in parsed_test_data]
 
     # Define Dataset
+    train_transform_fn = image_processing.get_image_transform(model_name=MODEL_NAME, with_augmentation=True)
+    test_transform_fn = image_processing.get_image_transform(model_name=MODEL_NAME, with_augmentation=False)
+
     print(f"Train samples: {len(train_data)}")
-    train_dataset = ExDataset(train_data, label_map, img_transform=image_processing.get_image_transform(True))
+    train_dataset = ExDataset(train_data, label_map, img_transform=train_transform_fn)
     print(f"Valid samples: {len(valid_data)}")
-    valid_dataset = ExDataset(valid_data, label_map, img_transform=image_processing.get_image_transform())
+    valid_dataset = ExDataset(valid_data, label_map, img_transform=test_transform_fn)
     print(f"Test samples: {len(test_data)}")
-    test_dataset = ExDataset(test_data, label_map, img_transform=image_processing.get_image_transform())
+    test_dataset = ExDataset(test_data, label_map, img_transform=test_transform_fn)
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
