@@ -27,6 +27,10 @@ LR = 1e-4
 DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
 WEB_LOGGING = False
+PROJECT_NAME = "EX-classification"
+MODEL_NAME = "resnet_18"
+RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
+LOG_CONFIG = {"LR": LR, "BATCH_SIZE": BATCH_SIZE, "EPOCHS": EPOCHS, "BACKBONE": MODEL_NAME.split("_")[0]}
 
 
 class ExDataset(Dataset):
@@ -128,11 +132,7 @@ def main():
 
     # Initial WebLogger
     if WEB_LOGGING:
-        wandb.init(
-            project="gray-resnet-classification",
-            name=f"resnet18-lr{LR}-bs{BATCH_SIZE}",
-            config={}
-        )
+        wandb.init(project=PROJECT_NAME, name=RUN_NAME, config=LOG_CONFIG)
 
     # Define model & trainer
     model = models.get_gray_resnet(num_layer=18, num_classes=max(label_indices) + 1)
