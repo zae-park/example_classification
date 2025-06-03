@@ -7,10 +7,10 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from sklearn.model_selection import train_test_split
-from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 
 from src import parse_dataset_structure
+from src import image_processing
 from src import trainer, schedulers
 from src import models
 from src import summarizer
@@ -21,7 +21,7 @@ VALIDATION_RATIO = 0.2
 RANDOM_SEED = 42
 
 EPS = 1e-8
-EPOCHS = 10
+EPOCHS = 100
 BATCH_SIZE = 32
 LR = 1e-4
 DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
@@ -111,21 +111,13 @@ def main():
     valid_data = list(zip(valid_paths, valid_labels))
     test_data = [(dp, label_map[label]) for dp, label in parsed_test_data]
 
-    # Preprocessing
-    transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5], std=[0.5])
-    ])
-
     # Define Dataset
     print(f"Train samples: {len(train_data)}")
-    train_dataset = ExDataset(train_data, label_map, img_transform=transform)
+    train_dataset = ExDataset(train_data, label_map, img_transform=image_processing.get_image_transform(True))
     print(f"Valid samples: {len(valid_data)}")
-    valid_dataset = ExDataset(valid_data, label_map, img_transform=transform)
+    valid_dataset = ExDataset(valid_data, label_map, img_transform=image_processing.get_image_transform())
     print(f"Test samples: {len(test_data)}")
-    test_dataset = ExDataset(test_data, label_map, img_transform=transform)
+    test_dataset = ExDataset(test_data, label_map, img_transform=image_processing.get_image_transform())
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
