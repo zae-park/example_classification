@@ -21,14 +21,14 @@ VALIDATION_RATIO = 0.2
 RANDOM_SEED = 42
 
 EPS = 1e-8
-EPOCHS = 100
-BATCH_SIZE = 32
+EPOCHS = 50
+BATCH_SIZE = 64
 LR = 1e-4
 DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
 WEB_LOGGING = True
 PROJECT_NAME = "EX-classification"
-MODEL_NAME = "resnet_18"
+MODEL_NAME = "resnet_34"
 RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
 LOG_CONFIG = {"LR": LR, "BATCH_SIZE": BATCH_SIZE, "EPOCHS": EPOCHS, "BACKBONE": MODEL_NAME.split("_")[0]}
 
