@@ -114,7 +114,7 @@ def get_gray_swin(model_name: str, num_classes: int) -> nn.Module:
 
 
 def get_gray_coatnet(version: str, num_classes: int) -> nn.Module:
-    if version not in timm.list_models("*coatnet*"):
+    if version + "_rw_224" not in timm.list_models("*coatnet*"):
         raise ValueError(f"Unsupported CoAtNet version: {version}")
 
     # Load pretrained model
