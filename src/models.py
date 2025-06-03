@@ -13,6 +13,8 @@ def get_model(model_name: str, num_classes: int) -> nn.Module:
     elif model_name.startswith("efficientnet_b"):
         version = model_name.split("_")[-1]
         return get_gray_efficientnet(version, num_classes)
+    elif model_name.startswith("swin_"):
+        return get_gray_swin(model_name, num_classes)
     else:
         raise ValueError(f"Unsupported model name: {model_name}")
 
@@ -85,3 +87,24 @@ def get_gray_efficientnet(version: str, num_classes: int) -> nn.Module:
 
     return model
 
+
+def get_gray_swin(model_name: str, num_classes: int) -> nn.Module:
+    model = swin_t(weights=Swin_T_Weights.DEFAULT)
+
+    pretrained_conv = model.features[0][0]  # Conv2d(3, 96, kernel_size=4, stride=4)
+    new_conv = nn.Conv2d(
+        in_channels=1,
+        out_channels=pretrained_conv.out_channels,
+        kernel_size=pretrained_conv.kernel_size,
+        stride=pretrained_conv.stride,
+        padding=pretrained_conv.padding,
+        bias=False
+    )
+
+    with torch.no_grad():
+        new_conv.weight = nn.Parameter(pretrained_conv.weight.mean(dim=1, keepdim=True))
+
+    model.features[0][0] = new_conv
+    model.head = nn.Linear(model.head.in_features, num_classes)
+
+    return model

@@ -28,7 +28,7 @@ DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
 WEB_LOGGING = True
 PROJECT_NAME = "EX-classification"
-MODEL_NAME = "resnet_34"
+MODEL_NAME = "resnet_50"
 RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
 LOG_CONFIG = {"LR": LR, "BATCH_SIZE": BATCH_SIZE, "EPOCHS": EPOCHS, "BACKBONE": MODEL_NAME.split("_")[0]}
 
