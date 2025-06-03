@@ -28,7 +28,7 @@ DEVICE = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
 
 WEB_LOGGING = True
 PROJECT_NAME = "EX-classification"
-MODEL_NAME = "efficientnet_b0"
+MODEL_NAME = "coatnet_0"
 RUN_NAME = f"model_{MODEL_NAME}-LR_{LR}"
 LOG_CONFIG = {"LR": LR, "BATCH_SIZE": BATCH_SIZE, "EPOCHS": EPOCHS, "BACKBONE": MODEL_NAME.split("_")[0]}
 
